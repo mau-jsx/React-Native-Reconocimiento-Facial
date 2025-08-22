@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "my-expo-app",
+    "slug": "my-expo-app",
+    "version": "1.0.0",
+
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+
+    "experiments": {
+      "tsconfigPaths": true
+    },
+
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Permite que la aplicación acceda a tu cámara",
+          "microphonePermission": "Permite que la aplicación acceda a tu micrófono",
+          "faceDetectionPermission": "Permite que la aplicación use detección facial"
+        }
+      ]
+    ],
+
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+
+    "userInterfaceStyle": "light",
+
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+
+    "assetBundlePatterns": ["**/*"],
+
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "Esta aplicación utiliza la cámara para el reconocimiento facial y mejorar tu experiencia de inicio de sesión.",
+        "NSMicrophoneUsageDescription": "Esta aplicación necesita acceso al micrófono cuando grabas videos."
+      }
+    },
+
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "permissions": ["android.permission.CAMERA", "android.permission.RECORD_AUDIO"],
+      "package": "com.tucompany.myexpoapp"
+    }
+  }
+}
