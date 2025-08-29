@@ -1,173 +1,131 @@
-import '../global.css';
 import { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Animated,
-  Easing,
-  ActivityIndicator,
-} from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../App';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import FaceRegisterScreen from './FaceRegisterScreen';
 
-type RegistroScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Registro'>;
+export default function RegistroPage() {
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    cuil: '',
+  });
 
-export default function RegistroScreen() {
-  const navigation = useNavigation<RegistroScreenNavigationProp>();
-  const [nombre, setNombre] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showFaceRegister, setShowFaceRegister] = useState(false);
 
-  const handleRegistro = () => {
-    if (!nombre || !email || !password || !confirmPassword) {
-      alert('⚠️ Por favor, completá todos los campos');
-      return;
-    }
+  function handleChange(field: string, value: string) {
+    setFormData({ ...formData, [field]: value });
+  }
 
-    if (password !== confirmPassword) {
-      alert('⚠️ Las contraseñas no coinciden');
-      return;
-    }
+  async function handleRegister() {
+    try {
+      if (
+        !formData.firstName ||
+        !formData.lastName ||
+        !formData.email ||
+        !formData.password ||
+        !formData.cuil
+      ) {
+        Alert.alert('⚠️ Error', 'Todos los campos son obligatorios');
+        return;
+      }
 
-    setLoading(true);
-    // Simular proceso de registro
-    setTimeout(() => {
+      setLoading(true);
+      console.log('📨 Registrando usuario:', formData);
+      const response = await fetch('https://tu-backend.com/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
+      console.log('📨 Respuesta del backend:', data);
+      Alert.alert('✅ Éxito', 'Usuario registrado correctamente');
+    } catch (error) {
+      console.error(error);
+      Alert.alert('❌ Error', 'No se pudo registrar el usuario');
+    } finally {
       setLoading(false);
-      console.log('Registrando:', nombre, email, password);
-      alert('✅ ¡Cuenta creada exitosamente!');
-      navigation.navigate('Login');
-    }, 1500);
-  };
+    }
+  }
+
+  if (showFaceRegister) {
+    return <FaceRegisterScreen cuil={formData.cuil} />;
+  }
 
   return (
-    <View className="flex-1 justify-center bg-gray-900 px-6">
-      <View className="mb-8 items-center">
-        <View className="mb-4 h-24 w-24 items-center justify-center rounded-full bg-green-600">
-          <Ionicons name="person-add" size={40} color="white" />
-        </View>
-        <Text className="mb-2 text-4xl font-bold text-white">Crear Cuenta</Text>
-        <Text className="text-center text-gray-400">Completá tus datos para comenzar</Text>
-      </View>
+    <View className="flex-1 items-center justify-center bg-gray-900 px-5">
+      <Text className="mb-5 text-2xl font-bold text-white">Registro de Usuario</Text>
 
-      <View className="mb-5">
-        <Text className="mb-2 ml-2 text-gray-400">Nombre completo</Text>
-        <View className="flex-row items-center rounded-2xl bg-gray-800 px-4 py-3">
-          <Ionicons name="person-outline" size={20} color="#aaa" className="mr-2" />
-          <TextInput
-            placeholder="Juan Pérez"
-            placeholderTextColor="#aaa"
-            value={nombre}
-            onChangeText={setNombre}
-            className="flex-1 text-white"
-            autoCapitalize="words"
-          />
-        </View>
-      </View>
+      {/* Nombre */}
+      <TextInput
+        placeholder="Nombre"
+        placeholderTextColor="#999"
+        value={formData.firstName}
+        onChangeText={(text) => handleChange('firstName', text)}
+        className="mb-3 w-full rounded-lg bg-white p-3"
+      />
 
-      <View className="mb-5">
-        <Text className="mb-2 ml-2 text-gray-400">Correo electrónico</Text>
-        <View className="flex-row items-center rounded-2xl bg-gray-800 px-4 py-3">
-          <Ionicons name="mail-outline" size={20} color="#aaa" className="mr-2" />
-          <TextInput
-            placeholder="tu@email.com"
-            placeholderTextColor="#aaa"
-            value={email}
-            onChangeText={setEmail}
-            className="flex-1 text-white"
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-        </View>
-      </View>
+      {/* Apellido */}
+      <TextInput
+        placeholder="Apellido"
+        placeholderTextColor="#999"
+        value={formData.lastName}
+        onChangeText={(text) => handleChange('lastName', text)}
+        className="mb-3 w-full rounded-lg bg-white p-3"
+      />
 
-      <View className="mb-5">
-        <Text className="mb-2 ml-2 text-gray-400">Contraseña</Text>
-        <View className="flex-row items-center rounded-2xl bg-gray-800 px-4 py-3">
-          <Ionicons name="lock-closed-outline" size={20} color="#aaa" className="mr-2" />
-          <TextInput
-            placeholder="••••••••"
-            placeholderTextColor="#aaa"
-            secureTextEntry={!showPassword}
-            value={password}
-            onChangeText={setPassword}
-            className="flex-1 text-white"
-          />
-          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-            <Ionicons
-              name={showPassword ? 'eye-off-outline' : 'eye-outline'}
-              size={20}
-              color="#aaa"
-            />
-          </TouchableOpacity>
-        </View>
-        <Text className="ml-2 mt-1 text-xs text-gray-500">Mínimo 8 caracteres</Text>
-      </View>
+      {/* Email */}
+      <TextInput
+        placeholder="Email"
+        placeholderTextColor="#999"
+        keyboardType="email-address"
+        value={formData.email}
+        onChangeText={(text) => handleChange('email', text)}
+        className="mb-3 w-full rounded-lg bg-white p-3"
+      />
 
-      <View className="mb-6">
-        <Text className="mb-2 ml-2 text-gray-400">Confirmar contraseña</Text>
-        <View className="flex-row items-center rounded-2xl bg-gray-800 px-4 py-3">
-          <Ionicons name="lock-closed-outline" size={20} color="#aaa" className="mr-2" />
-          <TextInput
-            placeholder="••••••••"
-            placeholderTextColor="#aaa"
-            secureTextEntry={!showConfirmPassword}
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            className="flex-1 text-white"
-          />
-          <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-            <Ionicons
-              name={showConfirmPassword ? 'eye-off-outline' : 'eye-outline'}
-              size={20}
-              color="#aaa"
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
+      {/* Password */}
+      <TextInput
+        placeholder="Contraseña"
+        placeholderTextColor="#999"
+        secureTextEntry
+        value={formData.password}
+        onChangeText={(text) => handleChange('password', text)}
+        className="mb-3 w-full rounded-lg bg-white p-3"
+      />
 
+      {/* CUIL */}
+      <TextInput
+        placeholder="CUIL"
+        placeholderTextColor="#999"
+        keyboardType="numeric"
+        value={formData.cuil}
+        onChangeText={(text) => handleChange('cuil', text)}
+        className="mb-3 w-full rounded-lg bg-white p-3"
+      />
+
+      {/* Botón registrar usuario */}
       <TouchableOpacity
-        onPress={handleRegistro}
-        className="mb-4 flex-row items-center justify-center rounded-2xl bg-green-600 py-4"
-        disabled={loading}>
+        onPress={handleRegister}
+        disabled={loading}
+        className="mb-4 w-full items-center rounded-lg bg-blue-600 p-3">
         {loading ? (
           <ActivityIndicator color="white" />
         ) : (
-          <>
-            <Text className="mr-2 text-center text-lg font-semibold text-white">Crear cuenta</Text>
-            <Ionicons name="arrow-forward" size={20} color="white" />
-          </>
+          <Text className="text-lg font-bold text-white">Registrar Usuario</Text>
         )}
       </TouchableOpacity>
-
-      <View className="my-6 flex-row items-center">
-        <View className="h-px flex-1 bg-gray-700" />
-        <Text className="mx-4 text-gray-500">o</Text>
-        <View className="h-px flex-1 bg-gray-700" />
-      </View>
-
-      <TouchableOpacity className="mb-4 flex-row items-center justify-center rounded-2xl bg-blue-600 py-3">
-        <Ionicons name="logo-facebook" size={20} color="white" className="mr-2" />
-        <Text className="text-center text-lg font-semibold text-white">Continuar con Facebook</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity className="flex-row items-center justify-center rounded-2xl bg-gray-800 py-3">
-        <Ionicons name="logo-google" size={20} color="white" className="mr-2" />
-        <Text className="text-center text-lg font-semibold text-white">Continuar con Google</Text>
-      </TouchableOpacity>
-
       <TouchableOpacity
-        className="mt-6 flex-row justify-center"
-        onPress={() => navigation.navigate('Login')}>
-        <Text className="text-gray-300">¿Ya tenés cuenta?</Text>
-        <Text className="ml-1 font-semibold text-green-400">Ingresar</Text>
+        onPress={() => {
+          if (!formData.cuil.trim()) {
+            Alert.alert('⚠️ Error', 'Debes ingresar tu CUIL antes de registrar el rostro');
+            return;
+          }
+          setShowFaceRegister(true);
+        }}
+        className="w-full items-center rounded-lg bg-green-600 p-3">
+        <Text className="text-lg font-bold text-white">Registrar Rostro</Text>
       </TouchableOpacity>
     </View>
   );
