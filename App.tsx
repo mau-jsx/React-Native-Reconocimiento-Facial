@@ -6,10 +6,12 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from './screen/loginScreen';
 import RegistroScreen from './screen/registroScrenn';
 import HomeScreen from './screen/homeScreen';
+import ProductosScreen from './screen/ProductosScreen';
 
 export type RootStackParamList = {
   Login: undefined;
   Registro: undefined;
+  Productos: undefined;
   Home: undefined;
 };
 
@@ -21,6 +23,7 @@ export default function App() {
       <StatusBar style="light" />
       <Stack.Navigator initialRouteName="Registro" screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Productos" component={ProductosScreen} />
         <Stack.Screen name="Registro" component={RegistroScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
       </Stack.Navigator>

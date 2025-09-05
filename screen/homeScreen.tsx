@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Animated, Easing } from 'react-native';
 import { Ionicons, MaterialCommunityIcons, Feather } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
 
 export default function HomeScreen() {
+  const navigation = useNavigation(); // ✅ Hook de navegación
   const [fadeAnim] = useState(new Animated.Value(0));
   const [slideAnim] = useState(new Animated.Value(30));
   const [scaleAnim] = useState(new Animated.Value(0.9));
@@ -36,7 +38,6 @@ export default function HomeScreen() {
     else if (hour < 19) setGreeting('¡Buenas tardes! 🌤️');
     else setGreeting('¡Buenas noches! 🌙');
 
-    // Actualizar tiempo cada minuto
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 60000);
@@ -44,7 +45,6 @@ export default function HomeScreen() {
     return () => clearInterval(timer);
   }, []);
 
-  // Datos mejorados para las tarjetas
   const features = [
     {
       id: 1,
@@ -99,6 +99,15 @@ export default function HomeScreen() {
       iconLib: 'Feather',
       gradientColors: ['#a8edea', '#fed6e3'],
       iconColor: '#a8edea',
+    },
+    {
+      id: 7,
+      title: 'Productos',
+      description: 'Gestiona tus productos con QR',
+      icon: 'qr-code',
+      iconLib: 'Ionicons',
+      gradientColors: ['#10b981', '#34d399'],
+      iconColor: '#10b981',
     },
   ];
 
@@ -188,7 +197,7 @@ export default function HomeScreen() {
 
   return (
     <View className="flex-1 bg-gray-950">
-      {/* Header mejorado */}
+      {/* Header */}
       <LinearGradient
         colors={['#1e1b4b', '#312e81', '#3730a3']}
         className="rounded-b-3xl px-6 pb-6 pt-12"
@@ -215,46 +224,13 @@ export default function HomeScreen() {
             </View>
           </TouchableOpacity>
         </View>
-
-        {/* Tarjeta de perfil mejorada */}
-        <Animated.View
-          style={{
-            opacity: fadeAnim,
-            transform: [{ translateY: slideAnim }, { scale: scaleAnim }],
-          }}>
-          <LinearGradient
-            colors={['rgba(255,255,255,0.15)', 'rgba(255,255,255,0.05)']}
-            className="rounded-3xl border border-white/20 p-5"
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}>
-            <View className="flex-row items-center">
-              <LinearGradient
-                colors={['#667eea', '#764ba2']}
-                className="mr-4 h-20 w-20 items-center justify-center rounded-2xl">
-                <MaterialCommunityIcons name="account" size={36} color="white" />
-              </LinearGradient>
-              <View className="flex-1">
-                <Text className="mb-1 text-2xl font-bold text-white">Mauricio Heredia</Text>
-                <Text className="mb-2 text-indigo-200">maxcer234@gmail.com</Text>
-                <View className="flex-row items-center">
-                  <View className="mr-2 h-3 w-3 rounded-full bg-emerald-400 shadow-lg shadow-emerald-400/50"></View>
-                  <Text className="text-sm font-medium text-emerald-400">En línea</Text>
-                  <View className="ml-4 flex-row items-center">
-                    <MaterialCommunityIcons name="star" size={16} color="#fbbf24" />
-                    <Text className="ml-1 text-sm font-medium text-yellow-400">Premium</Text>
-                  </View>
-                </View>
-              </View>
-            </View>
-          </LinearGradient>
-        </Animated.View>
       </LinearGradient>
 
       <ScrollView
         className="mt-6 flex-1 px-5"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 100 }}>
-        {/* Accesos rápidos mejorados */}
+        {/* Accesos rápidos */}
         <View className="mb-5 flex-row items-center justify-between">
           <Text className="text-2xl font-bold text-white">Accesos rápidos</Text>
           <TouchableOpacity>
@@ -278,7 +254,13 @@ export default function HomeScreen() {
                 ],
               }}
               className="mb-4 w-[48%]">
-              <TouchableOpacity className="overflow-hidden rounded-3xl border border-gray-800 bg-gray-900/80 backdrop-blur-sm">
+              <TouchableOpacity
+                className="overflow-hidden rounded-3xl border border-gray-800 bg-gray-900/80 backdrop-blur-sm"
+                onPress={() => {
+                  if (item.title === 'Productos') {
+                    navigation.navigate('Productos');
+                  }
+                }}>
                 <LinearGradient
                   colors={['rgba(255,255,255,0.1)', 'transparent']}
                   className="p-5"
@@ -299,7 +281,7 @@ export default function HomeScreen() {
           ))}
         </View>
 
-        {/* Actividad reciente mejorada */}
+        {/* Actividad reciente */}
         <View className="mb-5 flex-row items-center justify-between">
           <Text className="text-2xl font-bold text-white">Actividad reciente</Text>
           <TouchableOpacity>
@@ -329,22 +311,15 @@ export default function HomeScreen() {
           ))}
         </View>
 
-        {/* Estadísticas mejoradas */}
+        {/* Estadísticas */}
         <Text className="mb-5 text-2xl font-bold text-white">Tus estadísticas</Text>
         <View className="mb-8 flex-row justify-between">
-          {stats.map((stat, index) => (
+          {stats.map((stat) => (
             <Animated.View
               key={stat.id}
               style={{
                 opacity: fadeAnim,
-                transform: [
-                  {
-                    scale: scaleAnim.interpolate({
-                      inputRange: [0.9, 1],
-                      outputRange: [0.9, 1],
-                    }),
-                  },
-                ],
+                transform: [{ scale: scaleAnim }],
               }}
               className="w-[31%]">
               <LinearGradient
@@ -364,12 +339,14 @@ export default function HomeScreen() {
         </View>
       </ScrollView>
 
-      {/* Navigation Bar mejorado */}
+      {/* Bottom Navigation */}
       <LinearGradient
         colors={['rgba(17, 24, 39, 0.95)', 'rgba(17, 24, 39, 1)']}
         className="border-t border-gray-800">
         <View className="flex-row items-center justify-around py-4">
-          <TouchableOpacity className="items-center">
+          <TouchableOpacity
+            className="items-center"
+            onPress={() => navigation.navigate('Productos')}>
             <LinearGradient colors={['#667eea', '#764ba2']} className="mb-1 rounded-2xl p-2">
               <Ionicons name="home" size={24} color="white" />
             </LinearGradient>
